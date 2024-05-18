@@ -52,6 +52,15 @@ const plugins = [
       },
     },
   },
+  {
+    resolve: "medusa-payment-stripe",
+    options: {
+      api_key: process.env.STRIPE_SECRET_KEY,
+      // webhook_secret: '',
+      capture: true,
+      automatic_payment_methods: true,
+    },
+  },
 ];
 
 const modules = {
