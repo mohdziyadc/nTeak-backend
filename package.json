@@ -29,7 +29,7 @@
     "@medusajs/cache-inmemory": "latest",
     "@medusajs/cache-redis": "^1.9.1",
     "@medusajs/event-bus-local": "latest",
-    "@medusajs/event-bus-redis": "latest",
+    "@medusajs/event-bus-redis": "^1.8.13",
     "@medusajs/file-local": "latest",
     "@medusajs/medusa": "latest",
     "@tanstack/react-query": "4.22.0",
