@@ -33,6 +33,8 @@ const DATABASE_URL =
 
 const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
 
+console.log("Template Id email: " + process.env.SENDGRID_SIGN_UP_SUCCESS_ID);
+
 const plugins = [
   `medusa-fulfillment-manual`,
   `medusa-payment-manual`,
@@ -61,7 +63,17 @@ const plugins = [
       automatic_payment_methods: true,
     },
   },
+  {
+    resolve: "medusa-plugin-sendgrid",
+    options: {
+      api_key: process.env.SENDGRID_API_KEY,
+      from: process.env.SENDGRID_FROM,
+      signup_success_template: process.env.SENDGRID_SIGN_UP_SUCCESS_ID,
+    },
+  },
 ];
+
+//Need to send an email in the subscriber to cart.customer_updated event
 
 const modules = {
   eventBus: {
