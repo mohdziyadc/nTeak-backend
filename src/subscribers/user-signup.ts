@@ -11,7 +11,10 @@ class UserSignupSubscriber {
         );
         sendgridService.sendEmail({
           templateId: process.env.SENDGRID_SIGN_UP_SUCCESS_ID,
-          from: process.env.SENDGRID_FROM,
+          from: {
+            email: process.env.SENDGRID_FROM,
+            name: "Nilambur Teak",
+          },
           to: data.email,
           dynamic_template_data: {
             first_name: data.first_name,
