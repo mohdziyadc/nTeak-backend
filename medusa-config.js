@@ -33,7 +33,7 @@ const DATABASE_URL =
 
 const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
 
-console.log("Template Id email: " + process.env.SENDGRID_SIGN_UP_SUCCESS_ID);
+console.log("Template Id email: " + process.env.ORDER_PLACED_TEMPLATE);
 
 const plugins = [
   `medusa-fulfillment-manual`,
@@ -69,6 +69,7 @@ const plugins = [
       api_key: process.env.SENDGRID_API_KEY,
       from: process.env.SENDGRID_FROM,
       signup_success_template: process.env.SENDGRID_SIGN_UP_SUCCESS_ID,
+      order_placed_template: process.env.ORDER_PLACED_TEMPLATE,
     },
   },
 ];
