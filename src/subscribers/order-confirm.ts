@@ -45,25 +45,52 @@ class OrderConfirmSubscriber {
           "Template id from event handler: " + process.env.ORDER_PLACED_TEMPLATE
         );
 
-        const order = await this.orderService_.retrieve(data.id);
+        const order = await orderService.retrieve(data.id, {
+          select: [
+            "shipping_total",
+            "discount_total",
+            "tax_total",
+            "refunded_total",
+            "gift_card_total",
+            "subtotal",
+            "total",
+            "refundable_amount",
+          ],
+          relations: [
+            "customer",
+            "billing_address",
+            "shipping_address",
+            "discounts",
+            "discounts.rule",
+            "shipping_methods",
+            "shipping_methods.shipping_option",
+            "payments",
+            "fulfillments",
+            "returns",
+            "gift_cards",
+            "gift_card_transactions",
+          ],
+        });
 
-        let modifiedOrder;
-        try {
-          modifiedOrder = await this.orderPlacedData(order);
-        } catch (e) {
-          console.log(JSON.stringify(e));
-        }
+        const modifiedOrder = await this.orderPlacedData(order);
 
         console.log("Modified Order: " + JSON.stringify(modifiedOrder));
-        sendgridService.sendEmail({
-          templateId: process.env.ORDER_PLACED_TEMPLATE,
-          from: {
-            email: process.env.SENDGRID_FROM,
-            name: "Nilambur Teak",
-          },
-          to: modifiedOrder.email,
-          dynamic_template_data: modifiedOrder,
-        });
+        try {
+          sendgridService.sendEmail({
+            templateId: process.env.ORDER_PLACED_TEMPLATE,
+            from: {
+              email: process.env.SENDGRID_FROM,
+              name: "Nilambur Teak",
+            },
+            to: modifiedOrder.email,
+            dynamic_template_data: {
+              ...modifiedOrder,
+            },
+          });
+          console.log("Sendgrid Success " + JSON.stringify("Bruh"));
+        } catch (e) {
+          console.log("Sendgrid Error " + JSON.stringify(e));
+        }
       },
       {
         subscriberId: "order-placed-subscriber",
@@ -74,24 +101,30 @@ class OrderConfirmSubscriber {
   async orderPlacedData(order: Order) {
     const { tax_total, shipping_total, gift_card_total, total } = order;
 
+    console.log("The placed order: " + JSON.stringify(order));
+
     const currencyCode = order.currency_code.toUpperCase();
 
     const items = await Promise.all(
       order.items.map(async (i: any) => {
-        i.totals = await this.totalsService_.getLineItemTotals(i, order, {
-          include_tax: true,
-          use_tax_lines: true,
-        });
-        i.thumbnail = this.normalizeThumbUrl_(i.thumbnail);
-        i.discounted_price = `${this.humanPrice_(
-          i.totals.total / i.quantity,
-          currencyCode
-        )} ${currencyCode}`;
-        i.price = `${this.humanPrice_(
-          i.totals.original_total / i.quantity,
-          currencyCode
-        )} ${currencyCode}`;
-        return i;
+        try {
+          i.totals = await this.totalsService_.getLineItemTotals(i, order, {
+            include_tax: true,
+            use_tax_lines: true,
+          });
+          i.thumbnail = this.normalizeThumbUrl_(i.thumbnail);
+          i.discounted_price = `${this.humanPrice_(
+            i.totals.total / i.quantity,
+            currencyCode
+          )} ${currencyCode}`;
+          i.price = `${this.humanPrice_(
+            i.totals.original_total / i.quantity,
+            currencyCode
+          )} ${currencyCode}`;
+          return i;
+        } catch (e) {
+          console.log(JSON.stringify(e));
+        }
       })
     );
 
