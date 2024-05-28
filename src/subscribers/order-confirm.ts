@@ -4,7 +4,6 @@ import {
   OrderService,
   TotalsService,
 } from "@medusajs/medusa";
-// import { humanizeAmount, zeroDecimalCurrencies } from "medusa-core-utils";
 const zeroDecimalCurrencies = [
   "bif",
   "clp",
@@ -74,7 +73,6 @@ class OrderConfirmSubscriber {
 
         const modifiedOrder = await this.orderPlacedData(order);
 
-        console.log("Modified Order: " + JSON.stringify(modifiedOrder));
         try {
           sendgridService.sendEmail({
             templateId: process.env.ORDER_PLACED_TEMPLATE,
