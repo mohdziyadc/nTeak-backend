@@ -1,10 +1,10 @@
-import { CartService, OrderService, TotalsService } from "@medusajs/medusa";
+import { CartService, TotalsService, OrderService } from "@medusajs/medusa";
 import { orderPlacedData } from "src/utils/utils";
 
-class OrderConfirmSubscriber {
+class OrderShippedSubscriber {
   protected orderService_: OrderService;
-  protected totalsService_: TotalsService;
   protected cartService_: CartService;
+  protected totalsService_: TotalsService;
 
   constructor({
     eventBusService,
@@ -16,14 +16,16 @@ class OrderConfirmSubscriber {
     this.totalsService_ = totalsService;
     this.orderService_ = orderService;
     this.cartService_ = cartService;
+
     eventBusService.subscribe(
-      "order.placed",
+      "order.shipment_created",
       async (data) => {
         console.log(
-          "Template id from event handler: " + process.env.ORDER_PLACED_TEMPLATE
+          "Template id from order shipped event handler: " +
+            process.env.ORDER_SHIPPED_TEMPLATE
         );
 
-        const order = await orderService.retrieve(data.id, {
+        const order = await this.orderService_.retrieve(data.id, {
           select: [
             "shipping_total",
             "discount_total",
@@ -58,7 +60,7 @@ class OrderConfirmSubscriber {
 
         try {
           sendgridService.sendEmail({
-            templateId: process.env.ORDER_PLACED_TEMPLATE,
+            templateId: process.env.ORDER_SHIPPED_TEMPLATE,
             from: {
               email: process.env.SENDGRID_FROM,
               name: "Nilambur Teak",
@@ -74,10 +76,10 @@ class OrderConfirmSubscriber {
         }
       },
       {
-        subscriberId: "order-placed-subscriber",
+        subscriberId: "order-shipped-subscriber",
       }
     );
   }
 }
 
-export default OrderConfirmSubscriber;
+export default OrderShippedSubscriber;
