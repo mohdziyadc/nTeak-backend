@@ -1,0 +1,70 @@
+diff --git a/node_modules/@medusajs/admin-ui/ui/src/domain/orders/details/index.tsx b/node_modules/@medusajs/admin-ui/ui/src/domain/orders/details/index.tsx
+index 4356c73..4c01014 100644
+--- a/node_modules/@medusajs/admin-ui/ui/src/domain/orders/details/index.tsx
++++ b/node_modules/@medusajs/admin-ui/ui/src/domain/orders/details/index.tsx
+@@ -12,6 +12,7 @@ import {
+   useAdminRegion,
+   useAdminReservations,
+   useAdminUpdateOrder,
++  useAdminCompleteOrder
+ } from "medusa-react"
+ import { useNavigate, useParams } from "react-router-dom"
+ import OrderEditProvider, { OrderEditContext } from "../edit/context"
+@@ -39,6 +40,7 @@ import WidgetContainer from "../../../components/extensions/widget-container"
+ import Button from "../../../components/fundamentals/button"
+ import DetailsIcon from "../../../components/fundamentals/details-icon"
+ import CancelIcon from "../../../components/fundamentals/icons/cancel-icon"
++import CheckCircleIcon from '../../../components/fundamentals/icons/check-circle-icon'
+ import ClipboardCopyIcon from "../../../components/fundamentals/icons/clipboard-copy-icon"
+ import CornerDownRightIcon from "../../../components/fundamentals/icons/corner-down-right-icon"
+ import DollarSignIcon from "../../../components/fundamentals/icons/dollar-sign-icon"
+@@ -152,6 +154,7 @@ const OrderDetails = () => {
+ 
+   const capturePayment = useAdminCapturePayment(id!)
+   const cancelOrder = useAdminCancelOrder(id!)
++  const completeOrder = useAdminCompleteOrder(id!)
+ 
+   const {
+     state: addressModalState,
+@@ -249,6 +252,28 @@ const OrderDetails = () => {
+     })
+   }
+ 
++  const handleCompleteOrder = async () => {
++      const shouldComplete =  await dialog({
++        heading: t("details-complete-order-heading", "Complete Order"),
++        text: t("details-are-you-sure-you-want-to-complete-the-order", "Are you sure you want to complete the order?\nMake sure the shipping has been completed"),
++      })
++  
++      if(!shouldComplete){
++        return
++      }
++
++      completeOrder.mutate(void 0, {
++        onSuccess: () => {
++          notification(t('details-success', "Success"), t("details-successfully-completed-order", "Order marked as complete"), "success")
++        },
++        onError: (err) => {
++          notification(t("details-error", "Error"), getErrorMessage(err), "error")
++        }
++      })
++  }
++
++  
++
+   const allFulfillments = gatherAllFulfillments(order)
+ 
+   const customerActionables: ActionType[] = [
+@@ -368,6 +393,12 @@ const OrderDetails = () => {
+                       variant: "danger",
+                       onClick: () => handleDeleteOrder(),
+                     },
++                    {
++                      label: t('details-complete-order', "Complete Order"),
++                      icon: <CheckCircleIcon size={"20"}/>,
++                      variant:'normal',
++                      onClick: () => handleCompleteOrder(),
++                    }
+                   ]}
+                 >
+                   <div className="mt-6 flex space-x-6 divide-x">
