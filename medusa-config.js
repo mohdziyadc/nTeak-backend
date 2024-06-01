@@ -39,12 +39,6 @@ const plugins = [
   `medusa-fulfillment-manual`,
   `medusa-payment-manual`,
   {
-    resolve: `@medusajs/file-local`,
-    options: {
-      upload_dir: "uploads",
-    },
-  },
-  {
     resolve: "@medusajs/admin",
     /** @type {import('@medusajs/admin').PluginOptions} */
     options: {
@@ -70,6 +64,16 @@ const plugins = [
       from: process.env.SENDGRID_FROM,
       signup_success_template: process.env.SENDGRID_SIGN_UP_SUCCESS_ID,
       order_placed_template: process.env.ORDER_PLACED_TEMPLATE,
+    },
+  },
+  {
+    resolve: `medusa-file-s3`,
+    options: {
+      s3_url: process.env.S3_BUCKET_URL,
+      bucket: process.env.S3_BUCKET_NAME,
+      region: process.env.S3_BUCKET_REGION,
+      access_key_id: process.env.S3_ACCESS_KEY,
+      secret_access_key: process.env.S3_SECRET_ACCESS_KEY,
     },
   },
 ];
