@@ -76,6 +76,40 @@ const plugins = [
       secret_access_key: process.env.S3_SECRET_ACCESS_KEY,
     },
   },
+  {
+    resolve: "medusa-plugin-algolia",
+    options: {
+      applicationId: process.env.ALGOLIA_APP_ID,
+      adminApiKey: process.env.ALGOLIA_ADMIN_API_KEY,
+      settings: {
+        products: {
+          indexSettings: {
+            searchableAttributes: ["title", "description"],
+            attributesToRetrieve: [
+              "id",
+              "title",
+              "description",
+              "handle",
+              "thumbnail",
+              "variants",
+              "variant_sku",
+              "options",
+              "collection_title",
+              "collection_handle",
+              "images",
+            ],
+          },
+          transformer: (product) => ({
+            objectID: product.id,
+            title: product.title,
+            handle: product.handle,
+            thumbnail: product.thumbnail,
+            // other attributes...
+          }),
+        },
+      },
+    },
+  },
 ];
 
 //Need to send an email in the subscriber to cart.customer_updated event
